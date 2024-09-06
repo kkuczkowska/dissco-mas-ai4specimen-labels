@@ -66,7 +66,7 @@ def publish_annotation_event(annotation_event: Dict,
 
 def map_result_to_annotation(digital_object: Dict) -> List[Dict]:
     """
-    Given a target object, computes a result and maps the result to an OpenDS annotation
+    Given a target object, computes a result and maps the result to an openDS annotation
     :param digital_object: the target object of the annotation
     :return: List of annotations
     """
@@ -108,7 +108,7 @@ def map_result_to_annotation(digital_object: Dict) -> List[Dict]:
 def run_api_call(timestamp: str, query_string: str) -> List[Dict]:
     """
     Run API call or performs some computation on the target object
-    :param digital_object: Object (digital specimen or media) adhering to OpenDS
+    :param digital_object: Object (digital specimen or media) adhering to openDS
     standard. This may be a digital specimen or digital media object.
     :return: Value of the annotation (maps to oa:value)
     """

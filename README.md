@@ -5,16 +5,22 @@ This repository contains Boilerplate code to facilitate development of MASs. For
 You can find example MASs [on our GitHub](https://github.com/DiSSCo/demo-enrichment-service-image/)
 
 
+## Getting Help
+Creating issues in this repo is the best way to receive a quick response from the DiSSCo development team.
+
 ## Using This Repository
 This repository is intended to be forked and used as a template for the development of MASs. 
-The `annotation` package contains code that will format resulting calculations to the OpenDS annotation model.
-Two templates are provided: a default template and a batch template.
+The `annotation` package contains code that will format resulting calculations to the openDS annotation model.
+Two templates are provided: a default template and a batch template. Use the batch template if you wish to support batch operations. \
+Supporting batching may result in lower computational demand and reduce workload for the MAS and associated systems, but it 
+requires careful work to set up. More information can be found on our [wiki](https://github.com/DiSSCo/dissco-developers-documentation/wiki/Information-for-Machine-Annotation-Service-(MAS)-Developers). 
+If your MAS does not support batching, the default template is more suitable.
 
 ## Kafka Message
 
 Messages are sent between DiSSCo and MASs using [Kafka](https://kafka.apache.org/), an asynchronous event messaging platform. 
 
-The message will be in the following format: 
+The incoming message will be in the following format: 
 ```
 {
     "object": { ... },

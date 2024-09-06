@@ -19,8 +19,8 @@ to multiple specimen that meet the same criteria as the original target
 
 def start_kafka() -> None:
     """
-    Start a kafka listener and process the messages by unpacking the image.
-    When done it will republish the object, so it can be validated and stored by the processing service
+    Start a kafka listener and process the messages by unpacking the Digital Object.
+    When done it will publish the resulting annotation to the DiSSCo Annotation Processing Service
     """
     consumer = KafkaConsumer(os.environ.get('KAFKA_CONSUMER_TOPIC'),
                              group_id=os.environ.get('KAFKA_CONSUMER_GROUP'),
@@ -71,7 +71,7 @@ def publish_annotation_event(annotation_event: Dict,
 def map_result_to_annotation(digital_object: Dict, batching_requested: bool) -> \
 Tuple[List[Dict], List[Dict]]:
     """
-    Given a target object, computes a result and maps the result to an OpenDS annotation
+    Given a target object, computes a result and maps the result to an openDS annotation
     :param digital_object: the target object of the annotation
     :param batching_requested: Indicates if the scheduling client requested this operation be batched
     :return: List of annotations
@@ -132,7 +132,7 @@ def build_batch_metadata(digital_object: Dict, place_in_batch: int) -> Dict:
 def run_api_call(query_string: str) -> Dict:
     """
     Run API call or performs some computation on the target object
-    :param digital_object: Object (digital specimen or media) adhering to OpenDS
+    :param digital_object: Object (digital specimen or media) adhering to openDS
     standard. This may be a digital specimen or digital media object.
     :return: Value of the annotation (maps to oa:value)
     """

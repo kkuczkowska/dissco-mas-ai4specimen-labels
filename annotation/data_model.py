@@ -55,14 +55,16 @@ def build_agent() -> Dict[str, Any]:
 
 
 def map_to_assertion(timestamp: str, measurement_type: str,
-                     measurement_value: str, measurement_unit: str) -> Dict:
+                     measurement_value: str, measurement_unit: str, assertion_protocol: str, protocol_id: str) -> Dict:
     """
     Maps the result of some computation to an Assertion object
-    :param timestamp: timestamp of the
-    :param measurement_type:
-    :param measurement_value:
-    :param measurement_unit:
-    :return:
+    :param timestamp: timestamp of the annotation
+    :param measurement_type: The nature of the measurement, fact, characteristic, or assertion.
+    :param measurement_value: The value of the measurement, fact, characteristic, or assertion.
+    :param measurement_unit: Recommended best practice is to use a controlled vocabulary such as the Ontology of Units of Measure
+    :param assertion_protocol: The protocol used to make the assertion
+    :param protocol_id: The ID of the protocol used to make the assertion
+    :return: Formatted assertion object
     """
     return {
         AT_TYPE: 'ods:Assertion',
@@ -71,8 +73,8 @@ def map_to_assertion(timestamp: str, measurement_type: str,
         'dwc:measurementValue': measurement_value,
         'ods:AssertionByAgent': build_agent(),
         'dwc:measurementUnit': measurement_unit,
-        'ods:assertionProtocol': 'Image processing with Python Pillow library',
-        'ods:assertionProtocolID': 'https://pypi.org/project/pillow/'
+        'ods:assertionProtocol': assertion_protocol,
+        'ods:assertionProtocolID': protocol_id
     }
 
 
