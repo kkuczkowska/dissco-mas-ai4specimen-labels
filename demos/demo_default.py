@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import requests
 from kafka import KafkaConsumer, KafkaProducer
@@ -13,6 +13,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 """
 This is a template for a simple MAS that calls an API and sends a list of annotations back to DiSSCo. 
 """
+
 
 def start_kafka() -> None:
     """
@@ -30,29 +31,32 @@ def start_kafka() -> None:
         bootstrap_servers=[os.environ.get('KAFKA_PRODUCER_HOST')],
         value_serializer=lambda m: json.dumps(m).encode('utf-8'))
     for msg in consumer:
-        logging.info('Received message: ' + str(msg.value))
-        json_value = msg.value
-        # Indicates to DiSSCo the message has been received by the mas and the job is running.
-        # DiSSCo then informs the user of this development
-        ods.mark_job_as_running(job_id=json_value.get('jobId'))
-        digital_object = json_value.get('object')
-        annotations = map_result_to_annotation(digital_object)
-        event = ods.map_to_annotation_event(annotations, json_value['jobId'])
-        logging.info('Publishing annotation event: ' + json.dumps(event))
-        publish_annotation_event(event, producer)
+        try:
+            logging.info(f"Received message: {str(msg.value)}")
+            json_value = msg.value
+            # Indicates to DiSSCo the message has been received by the mas and the job is running.
+            # DiSSCo then informs the user of this development
+            ods.mark_job_as_running(job_id=json_value.get('jobId'))
+            digital_object = json_value.get('object')
+            annotations = map_result_to_annotation(digital_object)
+            event = ods.map_to_annotation_event(annotations,
+                                                json_value['jobId'])
+            logging.info(f"Publishing annotation event: {json.dumps(event)}")
+            publish_annotation_event(event, producer)
+        except Exception as e:
+            logging.error(f"Failed to publish annotation event: {e}")
 
 
-
-def build_query_string(digital_object: Dict) -> str:
+def build_query_string(digital_object: Dict[str, Any]) -> str:
     """
     Builds the query based on the digital object. Fill in your API call here
     :param digital_object: Target of the annotation
     :return: query string to some example API
     """
-    return f"https://example.api.com/search?value={digital_object.get('some parameter of interest')}" # Use your API here
+    return f"https://example.api.com/search?value={digital_object.get('some parameter of interest')}"  # Use your API here
 
 
-def publish_annotation_event(annotation_event: Dict,
+def publish_annotation_event(annotation_event: Dict[str, Any],
                              producer: KafkaProducer) -> None:
     """
       Send the annotation to the Kafka topic
@@ -60,11 +64,12 @@ def publish_annotation_event(annotation_event: Dict,
       :param producer: The initiated Kafka producer
       :return: Will not return anything
       """
-    logging.info('Publishing annotation: ' + str(annotation_event))
+    logging.info(f"Publishing annotation: {str(annotation_event)}")
     producer.send(os.environ.get('KAFKA_PRODUCER_TOPIC'), annotation_event)
 
 
-def map_result_to_annotation(digital_object: Dict) -> List[Dict]:
+def map_result_to_annotation(digital_object: Dict[str, Any]) -> List[
+    Dict[str, Any]]:
     """
     Given a target object, computes a result and maps the result to an openDS annotation
     :param digital_object: the target object of the annotation
@@ -105,15 +110,23 @@ def map_result_to_annotation(digital_object: Dict) -> List[Dict]:
 
     return annotations
 
-def run_api_call(timestamp: str, query_string: str) -> List[Dict]:
+
+def run_api_call(timestamp: str, query_string: str) -> List[Dict[str, Any]]:
     """
     Run API call or performs some computation on the target object
     :param digital_object: Object (digital specimen or media) adhering to openDS
     standard. This may be a digital specimen or digital media object.
     :return: Value of the annotation (maps to oa:value)
+    :raises: request exception on failed API call
     """
-    response = requests.get(query_string)
-    response.raise_for_status()
+    try:
+
+        response = requests.get(query_string)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        logging.error(f"API call failed: {e}")
+        raise requests.RequestException
+
     response_json = json.loads(response.content)
     '''
     It is up to the MAS developer to determine the best format for the value of the annotation.

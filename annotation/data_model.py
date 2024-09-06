@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timezone
 from typing import Dict, Any, List
 import json
@@ -55,7 +56,8 @@ def build_agent() -> Dict[str, Any]:
 
 
 def map_to_assertion(timestamp: str, measurement_type: str,
-                     measurement_value: str, measurement_unit: str, assertion_protocol: str, protocol_id: str) -> Dict:
+                     measurement_value: str, measurement_unit: str,
+                     assertion_protocol: str, protocol_id: str) -> Dict[str, Any]:
     """
     Maps the result of some computation to an Assertion object
     :param timestamp: timestamp of the annotation
@@ -79,7 +81,7 @@ def map_to_assertion(timestamp: str, measurement_type: str,
 
 
 def map_to_entity_relationship(relationship_type: str, resource_id: str,
-                               timestamp: str) -> Dict:
+                               timestamp: str) -> Dict[str, Any]:
     """
     Maps the result of some search to an Entity Relationship object
     :param relationship_type: Maps to dwc:relationshipOfResource
@@ -97,7 +99,8 @@ def map_to_entity_relationship(relationship_type: str, resource_id: str,
     }
 
 
-def map_to_annotation_event(annotations: List[Dict], job_id: str) -> Dict:
+def map_to_annotation_event(annotations: List[Dict[str, Any]], job_id: str) -> \
+Dict[str, Any]:
     """
     Maps to annotation event to be sent to DiSSCo
     :param annotations: List of annotations produced by DiSSCo
@@ -110,8 +113,10 @@ def map_to_annotation_event(annotations: List[Dict], job_id: str) -> Dict:
     }
 
 
-def map_to_annotation_event_batch(annotations: List[Dict], job_id: str,
-                                  batch_metadata: List[Dict]) -> Dict:
+def map_to_annotation_event_batch(annotations: List[Dict[str, Any]],
+                                  job_id: str,
+                                  batch_metadata: List[Dict[str, Any]]) -> \
+Dict[str, Any]:
     """
     Builds annotation event with batch metadata to send to DiSSCo
     :param annotations: Annotations produced by MAS
@@ -124,12 +129,12 @@ def map_to_annotation_event_batch(annotations: List[Dict], job_id: str,
         'jobId': job_id
     }
     if batch_metadata:
-        event['batchMetadata']: batch_metadata
+        event['batchMetadata'] = batch_metadata
     return event
 
 
 def map_to_annotation(timestamp: str,
-                      oa_value: Dict, oa_selector: Dict, target_id: str,
+                      oa_value: Dict[str, Any], oa_selector: Dict[str, Any], target_id: str,
                       target_type: str,
                       dcterms_ref: str) -> Dict[str, Any]:
     """
@@ -163,7 +168,7 @@ def map_to_annotation(timestamp: str,
     return annotation
 
 
-def build_class_selector(oa_class: str) -> Dict:
+def build_class_selector(oa_class: str) -> Dict[str, str]:
     """
     Builds Selector for annotations that affect classes
     :param oa_class: The full jsonPath of the class being annotate
@@ -175,7 +180,7 @@ def build_class_selector(oa_class: str) -> Dict:
     }
 
 
-def build_field_selector(ods_field: str) -> Dict:
+def build_field_selector(ods_field: str) -> Dict[str, str]:
     """
     A selector for an individual field.
     :param ods_field: The full jsonPath of the field being annotated
@@ -187,8 +192,8 @@ def build_field_selector(ods_field: str) -> Dict:
     }
 
 
-def build_fragment_selector(bounding_box: Dict, width: int,
-                            height: int) -> Dict:
+def build_fragment_selector(bounding_box: Dict[str, int], width: int,
+                            height: int) -> Dict[str, Any]:
     """
     A selector for a specific Region of Interest (ROI). ROI is expressed in the AudioVisual Core
     standard: https://ac.tdwg.org/termlist/. This selector type is only applicable on media objects.
@@ -203,7 +208,12 @@ def build_fragment_selector(bounding_box: Dict, width: int,
     :param width: The width of the image, used to calculate the ROI
     :param height: the height of the image, used to calculate the ROI
     :return: Formatted fragment selector
+    :raises: ValueError: if width or height is zero
     """
+    if width <= 0 or height <= 0:
+        raise ValueError(
+            f"Invalid dimensions: width ({width}) and height ({height}) must be greater than zero.")
+
     return {
         ODS_TYPE: 'oa:FragmentSelector',
         'dcterms:conformsTo': 'https://www.w3.org/TR/media-frags/',
