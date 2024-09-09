@@ -6,7 +6,7 @@ You can find example MASs [on our GitHub](https://github.com/DiSSCo/demo-enrichm
 
 
 ## Getting Help
-Creating issues in this repo is the best way to receive a quick response from the DiSSCo development team.
+Creating issues in this repository is the best way to receive a quick response from the DiSSCo development team.
 
 ## Using This Repository
 This repository is intended to be forked and used as a template for the development of MASs. 
