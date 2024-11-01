@@ -215,7 +215,7 @@ def build_fragment_selector(bounding_box: Dict[str, int], width: int,
             f"Invalid dimensions: width ({width}) and height ({height}) must be greater than zero.")
 
     return {
-        ODS_TYPE: 'oa:FragmentSelector',
+        AT_TYPE: 'oa:FragmentSelector',
         'dcterms:conformsTo': 'https://www.w3.org/TR/media-frags/',
         'ac:hasROI': {
             'ac:xFrac': bounding_box['x_min'] / width,
